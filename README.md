@@ -6,7 +6,7 @@ A listener-counting reverse proxy
 
 ## Background
 
-ListenStats was built for us to handle counting listeners on our Icecast streams. We originally did it using [Mr. Freeze](https://github.com/UniversityRadioYork/mr_freeze), which used Icecast's listener authentication feature, and while it works, there were quite a number of issues we wanted to avoid:
+ListenStats was built for us to handle counting listeners on our Icecast streams. We are currently doing it using [Mr. Freeze](https://github.com/UniversityRadioYork/mr_freeze), which uses Icecast's listener authentication feature, and while it works, there were quite a number of issues we would like to avoid:
 
 * Lack of support for X-Forwarded-For
 * Being tied to Icecast
