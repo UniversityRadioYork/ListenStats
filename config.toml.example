@@ -1,0 +1,7 @@
+HttpListenAddr = "localhost:3000"
+Reporter = "log"
+TrustedProxies = []
+
+[[HttpServers]]
+BaseUrl = "https://example.com"
+AllowedPaths = ["/live-high", "/live-high-ogg", "/live-mobile"]

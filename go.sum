@@ -1,0 +1,6 @@
+github.com/burntsushi/toml v0.3.1 h1:XebFhzi1T+XmBZG9aKnQnA50YOydJUYK7g5SM40w+ik=
+github.com/burntsushi/toml v0.3.1/go.mod h1:tCq67G3LEDB9hykA6+KWl2FPEy0nPcvE8TTBhtOtdGs=
+github.com/gorilla/mux v1.7.4 h1:VuZ8uybHlWmqV03+zRzdwKL4tUnIp1MAQtp1mIFE1bc=
+github.com/gorilla/mux v1.7.4/go.mod h1:DVbg23sWSpFRCP0SfiEN6jmj59UnW/n46BH5rLB71So=
+github.com/rs/xid v1.2.1 h1:mhH9Nq+C1fY2l1XIpgxIiUOfNpRBYH1kKcr+qfKgjRc=
+github.com/rs/xid v1.2.1/go.mod h1:+uKXf+4Djp6Md1KODXJxgGQPKngRmWyn10oCKFzNHOQ=
