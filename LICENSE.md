@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2020 University Radio YOrk
+Copyright (c) 2020 University Radio York
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
