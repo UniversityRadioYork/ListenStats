@@ -2,6 +2,15 @@ HttpListenAddr = "localhost:3000"
 Reporter = "log"
 TrustedProxies = []
 
+[Postgres]
+Host = "localhost"
+Port = 5432
+User = "no"
+Password = "really, no"
+Database = "myradio"
+Schema = "listens"
+MinListenTime = "10s"
+
 [[HttpServers]]
 BaseUrl = "https://example.com"
 AllowedPaths = ["/live-high", "/live-high-ogg", "/live-mobile"]

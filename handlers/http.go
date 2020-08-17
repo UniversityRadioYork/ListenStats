@@ -56,18 +56,21 @@ func (h *HttpHandler) Handle(w http.ResponseWriter, r *http.Request) {
 
 	listenerInfo, err := reporters.MakeListenerInfoFromRequest(h.cfg, reverseUrl, r)
 	if err != nil {
-		log.Println(fmt.Errorf("[%s] couldn't make listener info %t: %w", requestId, h.reporter, err))
+		log.Println(fmt.Errorf("[%s] couldn't make listener info %T: %w", requestId, h.reporter, err))
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	log.Printf("[%s] @ %s for %s hello\n", requestId, listenerInfo.IP, reverseUrl.String())
 
+	reportStart := time.Now()
 	if err := h.reporter.ReportListenStart(requestId.String(), listenerInfo); err != nil {
-		log.Println(fmt.Errorf("[%s] couldn't report listen start to reporter %t: %w", requestId, h.reporter, err))
+		log.Println(fmt.Errorf("[%s] couldn't report listen start to reporter %T: %w", requestId, h.reporter, err))
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+	reportEnd := time.Now()
+	log.Printf("[%s] reporting to %T took %v\n", requestId, h.reporter, reportEnd.Sub(reportStart))
 
 	reverseRes, err := http.Get(reverseUrl.String())
 	if err != nil {
@@ -96,6 +99,6 @@ func (h *HttpHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Printf("[%s] goodbye, was nice knowing you for %v\n", requestId, alive)
 	if err := h.reporter.ReportListenEnd(requestId.String(), alive); err != nil {
-		log.Println(fmt.Errorf("[%s] couldn't report listen end to reporter %t: %w", requestId, h.reporter, err))
+		log.Println(fmt.Errorf("[%s] couldn't report listen end to reporter %T: %w", requestId, h.reporter, err))
 	}
 }

@@ -12,6 +12,7 @@ type ListenerInfo struct {
 	IP          string
 	QueryParams url.Values
 	ServerURL   *url.URL
+	Headers     http.Header
 }
 
 func MakeListenerInfoFromRequest(cfg *config.Config, proxyUrl *url.URL, r *http.Request) (*ListenerInfo, error) {
@@ -24,6 +25,7 @@ func MakeListenerInfoFromRequest(cfg *config.Config, proxyUrl *url.URL, r *http.
 		IP:          utils.FindClientRemoteAddr(cfg, r),
 		QueryParams: q,
 		ServerURL:   proxyUrl,
+		Headers:     r.Header,
 	}, nil
 }
 

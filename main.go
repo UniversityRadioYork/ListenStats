@@ -24,7 +24,7 @@ func main() {
 		log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 		logfile, err := os.OpenFile(config.Logfile, os.O_APPEND|os.O_CREATE, os.ModeAppend)
 		if err != nil {
-			log.Fatal(fmt.Errorf("couldn't open logfiel %s: %w", config.Logfile, err))
+			log.Fatal(fmt.Errorf("couldn't open logfile %s: %w", config.Logfile, err))
 		}
 		log.SetOutput(io.MultiWriter(os.Stdout, logfile))
 	}
@@ -33,6 +33,12 @@ func main() {
 	switch config.Reporter {
 	case "log":
 		reporter = &reporters.LogReporter{}
+	case "postgres":
+		reporter, err = reporters.NewPostgresReporter(&config.Postgres)
+		if err != nil {
+			log.Fatal(fmt.Errorf("couldn't create postgres reporter: %w", err))
+		}
+		defer reporter.(*reporters.PostgresReporter).Close()
 	default:
 		log.Fatal(fmt.Errorf("unknown listener reporter %s", config.Reporter))
 	}
