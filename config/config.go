@@ -14,6 +14,7 @@ func (d *duration) UnmarshalText(text []byte) error {
 
 type Config struct {
 	HttpListenAddr string
+	HttpLocalIp    string
 	TrustedProxies []string
 	Reporter       string
 	Logfile        string

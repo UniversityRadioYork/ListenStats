@@ -7,7 +7,9 @@ import (
 	"io"
 	"listenstats/config"
 	"listenstats/reporters"
+	"listenstats/utils"
 	"log"
+	"net"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -32,6 +34,8 @@ type HttpHandler struct {
 	reporter     reporters.ListenReporter
 	reverseProxy *httputil.ReverseProxy
 }
+
+var didLocalIpWarn = false
 
 func NewHttpHandler(cfg *config.Config, reporter reporters.ListenReporter) *HttpHandler {
 	var def *config.HttpServer
@@ -58,6 +62,30 @@ func NewHttpHandler(cfg *config.Config, reporter reporters.ListenReporter) *Http
 			if _, ok := req.Header["User-Agent"]; !ok {
 				// explicitly disable User-Agent so it's not set to default value
 				req.Header.Set("User-Agent", "")
+			}
+			var localIp string
+			if cfg.HttpLocalIp != "" {
+				if !didLocalIpWarn {
+					log.Println("No local IP set in config, using default")
+				}
+				localIp = "127.0.0.1"
+			} else {
+				localIp = cfg.HttpLocalIp
+			}
+			xff := req.Header.Get("X-Forwarded-For")
+			if xff != "" {
+				if utils.IsLastProxyTrusted(cfg, xff, req) {
+					req.Header.Set("X-Forwarded-For", xff+", "+localIp)
+				} else {
+					// Untrusted proxy; reset XFF
+					req.Header.Set("X-Forwarded-For", "")
+				}
+			} else {
+				ip, _, err := net.SplitHostPort(req.RemoteAddr)
+				if err != nil {
+					panic(err)
+				}
+				req.Header.Set("X-Forwarded-For", ip+", "+localIp)
 			}
 		}
 		handler.reverseProxy = &httputil.ReverseProxy{Director: director}
