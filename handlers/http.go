@@ -53,6 +53,7 @@ func NewHttpHandler(cfg *config.Config, reporter reporters.ListenReporter) *Http
 		director := func(req *http.Request) {
 			req.URL.Scheme = defUrl.Scheme
 			req.URL.Host = defUrl.Host
+			req.Host = defUrl.Host
 			req.URL.Path = singleJoiningSlash(defUrl.Path, req.URL.Path)
 			if defUrl.RawQuery == "" || req.URL.RawQuery == "" {
 				req.URL.RawQuery = defUrl.RawQuery + req.URL.RawQuery

@@ -16,7 +16,7 @@ type PostgresReporter struct {
 
 func NewPostgresReporter(config *config.PostgresReporter) (*PostgresReporter, error) {
 	var pwd string
-	if strings.ContainsAny(config.Password, " ") {
+	if strings.ContainsAny(config.Password, " ") || len(config.Password) == 0 {
 		pwd = "'" + config.Password + "'"
 	} else {
 		pwd = config.Password
