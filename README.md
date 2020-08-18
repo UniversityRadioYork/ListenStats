@@ -22,7 +22,7 @@ In theory, this should work with non-Icecast hosts - you could in theory use Lis
 
 Download a [binary](https://github.com/UniversityRadioYork/ListenStats/releases) of the latest release for your OS of choice.
 
-Download [https://raw.githubusercontent.com/UniversityRadioYork/ListenStats/master/config.toml.example](config.toml.example) and save it as `config.toml`, and edit it to your needs.
+Download [config.toml.example](https://raw.githubusercontent.com/UniversityRadioYork/ListenStats/master/config.toml.example) and save it as `config.toml`, and edit it to your needs.
 
 Then, run `./listenstats-{version}-{os}`. You can pass in a path to an alternate config file as the first parameter, e.g. `./listenstats /path/to/config.toml`.
 
