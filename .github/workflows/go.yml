@@ -36,8 +36,8 @@ jobs:
     - name: Test
       run: go test -v .
     
-    - name: Upload math result for job 1
+    - name: Upload binary
       uses: actions/upload-artifact@v2
       with:
           name: listenstats-${{ matrix.os }}-go-${{ matrix.go-version}}
-          path: listenstats
+          path: listenstats*
