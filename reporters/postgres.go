@@ -5,6 +5,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"listenstats/config"
+	"strings"
 	"time"
 )
 
@@ -14,12 +15,18 @@ type PostgresReporter struct {
 }
 
 func NewPostgresReporter(config *config.PostgresReporter) (*PostgresReporter, error) {
+	var pwd string
+	if strings.ContainsAny(config.Password, " ") {
+		pwd = "'" + config.Password + "'"
+	} else {
+		pwd = config.Password
+	}
 	connString := fmt.Sprintf(
-		"host=%s port=%d user=%s password='%s' dbname=%s sslmode=disable",
+		"host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		config.Host,
 		config.Port,
 		config.User,
-		config.Password,
+		pwd,
 		config.Database,
 	)
 	if config.Schema != "" {
