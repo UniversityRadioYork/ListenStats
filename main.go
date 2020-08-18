@@ -54,7 +54,7 @@ func main() {
 
 	httpHandler := handlers.NewHttpHandler(&config, reporter)
 
-	r.HandleFunc("/{endpoint}", httpHandler.Handle)
+	r.HandleFunc("/{endpoint:.*}", httpHandler.Handle)
 
 	log.Printf("Listening on %s\n", config.HttpListenAddr)
 	log.Fatal(http.ListenAndServe(config.HttpListenAddr, r))
