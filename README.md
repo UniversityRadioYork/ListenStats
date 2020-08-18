@@ -20,7 +20,7 @@ In theory, this should work with non-Icecast hosts - you could in theory use Lis
 
 ## From Binaries
 
-Download a [binary](https://github.com/UniversityRadioYork/ListenStats/releases) of the latest release for your OS of choice.
+Download a [binary](https://github.com/UniversityRadioYork/ListenStats/releases) of the latest release for your OS of choice. If you want to use a bleeding-edge build, you can download them from [GitHub Actions](https://github.com/UniversityRadioYork/ListenStats/actions?query=workflow%3AGo) (click on the latest build and look under Artifacts), but be aware that they may be buggy!
 
 Download [config.toml.example](https://raw.githubusercontent.com/UniversityRadioYork/ListenStats/master/config.toml.example) and save it as `config.toml`, and edit it to your needs.
 
