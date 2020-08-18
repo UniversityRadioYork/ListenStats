@@ -110,7 +110,7 @@ func (h *HttpHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	if server == nil {
 		if h.reverseProxy != nil {
 			// let the reverse proxy handle it
-			log.Printf("[%s] path non-match, passing to default\n", requestId)
+			log.Printf("[%s] path (%s) non-match, passing to default\n", requestId, r.URL.Path)
 			h.reverseProxy.ServeHTTP(w, r)
 			return
 		} else {
