@@ -39,5 +39,5 @@ jobs:
     - name: Upload math result for job 1
       uses: actions/upload-artifact@v2
       with:
-          name: listenstats-${{ matrix.os 
+          name: listenstats-${{ matrix.os }}-go-${{ matrix.go-version}}
           path: listenstats
