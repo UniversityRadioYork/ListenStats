@@ -75,7 +75,7 @@ func NewHttpHandler(cfg *config.Config, reporter reporters.ListenReporter) *Http
 			}
 			xff := req.Header.Get("X-Forwarded-For")
 			if xff != "" {
-				if utils.IsLastProxyTrusted(cfg, xff, req) {
+				if utils.IsLastProxyTrusted(cfg, req) {
 					req.Header.Set("X-Forwarded-For", xff+", "+localIp)
 				} else {
 					// Untrusted proxy; reset XFF
