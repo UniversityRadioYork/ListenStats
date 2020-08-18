@@ -14,8 +14,14 @@ User = "no"
 Password = "really, no"
 Database = "myradio"
 Schema = "listens"
+# If set, only listens that were around for at least this time will be counted
 MinListenTime = "10s"
 
 [[HttpServers]]
+# The URL of the server to send all requests to
 BaseUrl = "https://example.com"
+# Only requests to these paths (matching *exactly*) will be counted as listens
 AllowedPaths = ["/live-high", "/live-high-ogg", "/live-mobile"]
+# If set, and no server-path combination matches, requests will be forwarded to this server
+# (and not counted as listens)
+Default = true

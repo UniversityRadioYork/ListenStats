@@ -67,6 +67,7 @@ func NewHttpHandler(cfg *config.Config, reporter reporters.ListenReporter) *Http
 			if cfg.HttpLocalIp != "" {
 				if !didLocalIpWarn {
 					log.Println("No local IP set in config, using default")
+					didLocalIpWarn = true
 				}
 				localIp = "127.0.0.1"
 			} else {
@@ -130,7 +131,7 @@ func (h *HttpHandler) Handle(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	reverseUrl.Path = "/" + vars["endpoint"]
+	reverseUrl.Path = singleJoiningSlash(reverseUrl.Path, vars["endpoint"])
 
 	listenerInfo, err := reporters.MakeListenerInfoFromRequest(h.cfg, reverseUrl, r)
 	if err != nil {
