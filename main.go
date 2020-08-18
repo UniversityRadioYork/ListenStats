@@ -14,8 +14,15 @@ import (
 )
 
 func main() {
+	var configPath string
+	if len(os.Args) >= 2 {
+		configPath = os.Args[1]
+	} else {
+		configPath = "config.toml"
+	}
+
 	var config cfg.Config
-	_, err := toml.DecodeFile("config.toml", &config)
+	_, err := toml.DecodeFile(configPath, &config)
 	if err != nil {
 		log.Fatal(fmt.Errorf("couldn't parse config: %w", err))
 	}
