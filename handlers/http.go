@@ -9,29 +9,66 @@ import (
 	"listenstats/reporters"
 	"log"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
+	"strings"
 	"time"
 )
 
+func singleJoiningSlash(a, b string) string {
+	aslash := strings.HasSuffix(a, "/")
+	bslash := strings.HasPrefix(b, "/")
+	switch {
+	case aslash && bslash:
+		return a + b[1:]
+	case !aslash && !bslash:
+		return a + "/" + b
+	}
+	return a + b
+}
+
 type HttpHandler struct {
-	cfg      *config.Config
-	reporter reporters.ListenReporter
+	cfg          *config.Config
+	reporter     reporters.ListenReporter
+	reverseProxy *httputil.ReverseProxy
 }
 
 func NewHttpHandler(cfg *config.Config, reporter reporters.ListenReporter) *HttpHandler {
-	return &HttpHandler{cfg: cfg, reporter: reporter}
+	var def *config.HttpServer
+	for i, serv := range cfg.HttpServers {
+		if serv.Default {
+			def = &cfg.HttpServers[i]
+		}
+	}
+	handler := &HttpHandler{cfg: cfg, reporter: reporter}
+	if def != nil {
+		defUrl, err := url.Parse(def.BaseUrl)
+		if err != nil {
+			panic(err)
+		}
+		director := func(req *http.Request) {
+			req.URL.Scheme = defUrl.Scheme
+			req.URL.Host = defUrl.Host
+			req.URL.Path = singleJoiningSlash(defUrl.Path, req.URL.Path)
+			if defUrl.RawQuery == "" || req.URL.RawQuery == "" {
+				req.URL.RawQuery = defUrl.RawQuery + req.URL.RawQuery
+			} else {
+				req.URL.RawQuery = defUrl.RawQuery + "&" + req.URL.RawQuery
+			}
+			if _, ok := req.Header["User-Agent"]; !ok {
+				// explicitly disable User-Agent so it's not set to default value
+				req.Header.Set("User-Agent", "")
+			}
+		}
+		handler.reverseProxy = &httputil.ReverseProxy{Director: director}
+	}
+	return handler
 }
 
 func (h *HttpHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	requestId := xid.New()
 	w.Header().Add("X-URY-RequestID", requestId.String())
 	vars := mux.Vars(r)
-
-	if r.Method != "GET" {
-		log.Printf("[%s] invalid method %s", requestId, r.Method)
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
 
 	var server *config.HttpServer
 	for _, srv := range h.cfg.HttpServers {
@@ -42,7 +79,20 @@ func (h *HttpHandler) Handle(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if server == nil {
-		w.WriteHeader(http.StatusNotFound)
+		if h.reverseProxy != nil {
+			// let the reverse proxy handle it
+			log.Printf("[%s] path non-match, passing to default\n", requestId)
+			h.reverseProxy.ServeHTTP(w, r)
+			return
+		} else {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+	}
+
+	if r.Method != "GET" {
+		log.Printf("[%s] invalid method %s", requestId, r.Method)
+		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 

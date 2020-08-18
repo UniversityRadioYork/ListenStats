@@ -25,6 +25,7 @@ type Config struct {
 type HttpServer struct {
 	BaseUrl      string
 	AllowedPaths []string
+	Default      bool
 }
 
 type PostgresReporter struct {
