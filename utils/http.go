@@ -29,8 +29,8 @@ func FindClientRemoteAddr(cfg *config.Config, r *http.Request) string {
 		// Check the identity of the last proxy to touch it
 		// See https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For
 		if IsLastProxyTrusted(cfg, r) {
-			ips := strings.Split(xff, ", ")
-			addr = ips[0]
+			ips := strings.Split(xff, ",")
+			addr = strings.TrimSpace(ips[0])
 		}
 	}
 	return addr
