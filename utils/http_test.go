@@ -52,3 +52,23 @@ func TestRemoteAddrXFFMulti(t *testing.T) {
 		t.Fatalf("expected 127.0.0.2, got %s", result)
 	}
 }
+
+var cidrCfg = config.Config{
+	TrustedProxies: []string{"127.0.0.0/24", "41.101.64.0/18"},
+}
+
+func TestIsLastProxyTrusted(t *testing.T) {
+	req := httptest.NewRequest("GET", "http://localhost:3000", nil)
+	req.RemoteAddr = "127.0.0.1:5589"
+	if !IsLastProxyTrusted(&cidrCfg, req) {
+		t.Fatalf("Expected to trust %v", req.RemoteAddr)
+	}
+	req.RemoteAddr = "127.0.1.1:5589"
+	if IsLastProxyTrusted(&cidrCfg, req) {
+		t.Fatalf("Expected to not trust %v", req.RemoteAddr)
+	}
+	req.RemoteAddr = "41.101.64.176:5589"
+	if !IsLastProxyTrusted(&cidrCfg, req) {
+		t.Fatalf("Expected to trust %v", req.RemoteAddr)
+	}
+}
