@@ -33,7 +33,7 @@ jobs:
     - name: Build
       run: |
         mkdir -p bin
-        go build -o bin/listenstats-${{ matrix.os }}-${{ matrix.go-version }}${{ matrix.os == 'windows' && '.exe' }} -v .
+        go build -o bin/listenstats-${{ matrix.os }}-${{ matrix.go-version }}${{ matrix.os == 'windows' && '.exe' || '' }} -v .
 
     - name: Test
       run: go test -v .
