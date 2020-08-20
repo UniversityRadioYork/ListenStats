@@ -31,6 +31,7 @@ jobs:
         go get -v -t -d ./...
 
     - name: Build
+      shell: bash
       run: |
         mkdir -p bin
         go build -o bin/listenstats-${{ matrix.os }}-${{ matrix.go-version }}${{ matrix.os == 'windows' && '.exe' || '' }} -v .
