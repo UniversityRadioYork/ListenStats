@@ -31,19 +31,15 @@ jobs:
         go get -v -t -d ./...
 
     - name: Build
-      run: go build -v .
+      run: |
+        mkdir -p bin
+        go build -o bin/listenstats-${{ matrix.os }}-${{ matrix.go-version }}${{ matrix.os == 'windows' && '.exe' }} -v .
 
     - name: Test
       run: go test -v .
-    
-    - name: Prepare binaries for upload
-      shell: bash
-      run: |
-        mv listenstats listenstats-${{ matrix.os }} || true
-        mv listenstats.exe listenstats-${{ matrix.os }}.exe || true
     
     - name: Upload binary
       uses: actions/upload-artifact@v2
       with:
           name: listenstats-${{ github.sha }}-go-${{ matrix.go-version}}
-          path: listenstats*
+          path: bin/*
