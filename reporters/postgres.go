@@ -40,6 +40,12 @@ func NewPostgresReporter(config *config.PostgresReporter) (*PostgresReporter, er
 	if err != nil {
 		return nil, err
 	}
+	if config.ResetOnStart {
+		_, err = db.Exec("UPDATE listen SET time_end = NOW() WHERE time_start < NOW() AND time_end IS NULL")
+		if err != nil {
+			return nil, err
+		}
+	}
 	return &PostgresReporter{db: db, minListenTime: config.MinListenTime.Duration}, nil
 }
 

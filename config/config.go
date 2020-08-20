@@ -70,4 +70,5 @@ type PostgresReporter struct {
 	Database      string
 	Schema        string
 	MinListenTime duration
+	ResetOnStart  bool
 }

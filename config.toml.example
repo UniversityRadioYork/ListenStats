@@ -19,6 +19,9 @@ Database = "myradio"
 Schema = "listens"
 # If set, only listens that were around for at least this time will be counted
 MinListenTime = "10s"
+# If true, all open listens (that is, with a null time_end) will be ended when ListenStats starts up
+# Do not set if you have more than one ListenStats server!
+ResetOnStart = false
 
 [[HttpServers]]
 # The URL of the server to send all requests to
