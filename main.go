@@ -27,6 +27,10 @@ func main() {
 		log.Fatal(fmt.Errorf("couldn't parse config: %w", err))
 	}
 
+	if err := config.Init(); err != nil {
+		log.Fatal(fmt.Errorf("failed to initalise CDN: %w", err))
+	}
+
 	if config.Logfile != "" {
 		log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 		logfile, err := os.OpenFile(config.Logfile, os.O_APPEND|os.O_CREATE, os.ModeAppend)
@@ -35,7 +39,6 @@ func main() {
 		}
 		log.SetOutput(io.MultiWriter(os.Stdout, logfile))
 	}
-
 	var reporter reporters.ListenReporter
 	switch config.Reporter {
 	case "log":

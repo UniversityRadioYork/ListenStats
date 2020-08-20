@@ -1,6 +1,10 @@
 package config
 
-import "time"
+import (
+	"fmt"
+	"listenstats/utils"
+	"time"
+)
 
 type duration struct {
 	time.Duration
@@ -15,12 +19,35 @@ func (d *duration) UnmarshalText(text []byte) error {
 type Config struct {
 	HttpListenAddr string
 	HttpLocalIp    string
-	TrustedProxies []string
 	Reporter       string
 	Logfile        string
 	Postgres       PostgresReporter
 
+	TrustedProxies []string
+	TrustedCDNs    []string
+
 	HttpServers []HttpServer
+}
+
+func (c *Config) Init() error {
+	// For future flexibility
+	return c.GetCDNIPs()
+}
+
+func (c *Config) GetCDNIPs() error {
+	for _, cdn := range c.TrustedCDNs {
+		switch cdn {
+		case "cloudflare":
+			cloudflareIps, err := utils.GetCloudflareIPRanges()
+			if err != nil {
+				return err
+			}
+			c.TrustedProxies = append(c.TrustedProxies, cloudflareIps...)
+		default:
+			return fmt.Errorf("Unknown CDN %s", cdn)
+		}
+	}
+	return nil
 }
 
 type HttpServer struct {

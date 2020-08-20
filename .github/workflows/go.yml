@@ -37,13 +37,13 @@ jobs:
         go build -o bin -v .
 
     - name: Test
-      run: go test -v .
-    
+      run: go test -v ./...
+
     - name: Rename MacOS/Linux binaries
       shell: bash
       if: ${{ ! startsWith(matrix.os, 'windows') }}
       run: mv bin/listenstats bin/listenstats-${{ matrix.os }}
-    
+
     - name: Upload binary
       uses: actions/upload-artifact@v2
       with:
