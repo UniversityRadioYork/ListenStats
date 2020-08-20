@@ -34,7 +34,7 @@ jobs:
       shell: bash
       run: |
         mkdir -p bin
-        go build -o bin/listenstats-${{ matrix.os }}-${{ matrix.go-version }}${{ matrix.os == 'windows' && '.exe' || '' }} -v .
+        go build -o bin -v .
 
     - name: Test
       run: go test -v .
