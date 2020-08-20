@@ -43,6 +43,12 @@ func (c *Config) GetCDNIPs() error {
 				return err
 			}
 			c.TrustedProxies = append(c.TrustedProxies, cloudflareIps...)
+		case "project_shield":
+			projectShieldIps, err := utils.GetProjectShieldIPRanges()
+			if err != nil {
+				return err
+			}
+			c.TrustedProxies = append(c.TrustedProxies, projectShieldIps...)
 		default:
 			return fmt.Errorf("Unknown CDN %s", cdn)
 		}

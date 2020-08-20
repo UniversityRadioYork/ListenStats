@@ -31,3 +31,8 @@ func GetCloudflareIPRanges() ([]string, error) {
 	}
 	return append(rangesV4, rangesV6...), nil
 }
+
+func GetProjectShieldIPRanges() ([]string, error) {
+	// So far PS only has one IP. Yeet.
+	return []string{"35.235.224.0/20"}, nil
+}
