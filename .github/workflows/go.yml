@@ -41,7 +41,8 @@ jobs:
     
     - name: Rename MacOS/Linux binaries
       shell: bash
-      run: mv bin/listenstats bin/listenstats-${{ env.os }} || true
+      if: ${{ ! startsWith(matrix.os, 'windows') }}
+      run: mv bin/listenstats bin/listenstats-${{ matrix.os }}
     
     - name: Upload binary
       uses: actions/upload-artifact@v2
