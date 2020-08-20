@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	"listenstats/utils"
+	"listenstats/utils/cdns"
 	"time"
 )
 
@@ -38,13 +38,13 @@ func (c *Config) GetCDNIPs() error {
 	for _, cdn := range c.TrustedCDNs {
 		switch cdn {
 		case "cloudflare":
-			cloudflareIps, err := utils.GetCloudflareIPRanges()
+			cloudflareIps, err := cdns.GetCloudflareIPRanges()
 			if err != nil {
 				return err
 			}
 			c.TrustedProxies = append(c.TrustedProxies, cloudflareIps...)
 		case "project_shield":
-			projectShieldIps, err := utils.GetProjectShieldIPRanges()
+			projectShieldIps, err := cdns.GetProjectShieldIPRanges()
 			if err != nil {
 				return err
 			}
