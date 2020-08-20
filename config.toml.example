@@ -5,7 +5,7 @@ Reporter = "log"
 # Reverse proxies to trust with X-Forwarded-For values.
 TrustedProxies = []
 # If using a supported CDN, their IP ranges can be automatically added to TrustedProxies.
-# Currently supported CDNs: cloudflare
+# Currently supported CDNs: cloudflare, project_shield
 TrustedCDNs = ["cloudflare"]
 # If using a http reverse proxy with Default, set this to this server's IP. It will be added to the X-Forwarded-For header.
 HttpLocalIp = "192.168.0.1"
