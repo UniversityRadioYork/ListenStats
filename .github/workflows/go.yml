@@ -36,8 +36,14 @@ jobs:
     - name: Test
       run: go test -v .
     
+    - name: Prepare binaries for upload
+      shell: bash
+      run: |
+        mv listenstats listenstats-${{ matrix.os }}-go-${{ matrix.go-version}} || true
+        mv listenstats.exe listenstats-${{ matrix.os }}-go-${{ matrix.go-version}} || true
+    
     - name: Upload binary
       uses: actions/upload-artifact@v2
       with:
-          name: listenstats-${{ matrix.os }}-go-${{ matrix.go-version}}
-          path: listenstats*
+          name: listenstats-${{ github.sha }}-go-${{ matrix.go-version}}
+          path: listenstats-${{ matrix.os }}-go-${{ matrix.go-version}}
