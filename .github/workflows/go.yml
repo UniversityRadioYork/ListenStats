@@ -39,6 +39,10 @@ jobs:
     - name: Test
       run: go test -v .
     
+    - name: Rename MacOS/Linux binaries
+      shell: bash
+      run: mv bin/listenstats bin/listenstats-${{ env.os }} || true
+    
     - name: Upload binary
       uses: actions/upload-artifact@v2
       with:
