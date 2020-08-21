@@ -159,6 +159,8 @@ func (h *HttpHandler) Handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	defer reverseRes.Body.Close()
+
 	if reverseRes.StatusCode != 200 {
 		log.Printf("[%s] reverse proxy non-200 (%s), passing through\n", requestId, reverseRes.Status)
 	}

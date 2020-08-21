@@ -11,6 +11,7 @@ func getUrlAndParseLines(url string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer res.Body.Close()
 	buf := new(strings.Builder)
 	_, err = io.Copy(buf, res.Body)
 	if err != nil {
