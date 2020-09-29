@@ -111,7 +111,9 @@ func (h *HttpHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	if server == nil {
 		if h.reverseProxy != nil {
 			// let the reverse proxy handle it
-			log.Printf("[%s] path (%s) non-match, passing to default\n", requestId, r.URL.Path)
+			if h.cfg.Verbosity >= 2 {
+				log.Printf("[%s] path (%s) non-match, passing to default\n", requestId, r.URL.Path)
+			}
 			h.reverseProxy.ServeHTTP(w, r)
 			return
 		} else {
@@ -121,7 +123,9 @@ func (h *HttpHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Method != "GET" {
-		log.Printf("[%s] invalid method %s", requestId, r.Method)
+		if h.cfg.Verbosity >= 1 {
+			log.Printf("[%s] invalid method %s", requestId, r.Method)
+		}
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
@@ -141,7 +145,9 @@ func (h *HttpHandler) Handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("[%s] @ %s for %s hello\n", requestId, listenerInfo.IP, reverseUrl.String())
+	if h.cfg.Verbosity >= 2 {
+		log.Printf("[%s] @ %s for %s hello\n", requestId, listenerInfo.IP, reverseUrl.String())
+	}
 
 	reportStart := time.Now()
 	if err := h.reporter.ReportListenStart(requestId.String(), listenerInfo); err != nil {
@@ -150,7 +156,9 @@ func (h *HttpHandler) Handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	reportEnd := time.Now()
-	log.Printf("[%s] reporting to %T took %v\n", requestId, h.reporter, reportEnd.Sub(reportStart))
+	if h.cfg.Verbosity >= 2 {
+		log.Printf("[%s] reporting to %T took %v\n", requestId, h.reporter, reportEnd.Sub(reportStart))
+	}
 
 	reverseRes, err := http.Get(reverseUrl.String())
 	if err != nil {
@@ -162,7 +170,9 @@ func (h *HttpHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	defer reverseRes.Body.Close()
 
 	if reverseRes.StatusCode != 200 {
-		log.Printf("[%s] reverse proxy non-200 (%s), passing through\n", requestId, reverseRes.Status)
+		if h.cfg.Verbosity >= 1 {
+			log.Printf("[%s] reverse proxy non-200 (%s), passing through\n", requestId, reverseRes.Status)
+		}
 	}
 	for key, vals := range reverseRes.Header {
 		for _, val := range vals {
@@ -179,7 +189,9 @@ func (h *HttpHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(fmt.Errorf("[%s] reverse proxy passthrough failed: %w", requestId, err))
 	}
-	log.Printf("[%s] goodbye, was nice knowing you for %v\n", requestId, alive)
+	if h.cfg.Verbosity >= 2 {
+		log.Printf("[%s] goodbye, was nice knowing you for %v\n", requestId, alive)
+	}
 	if err := h.reporter.ReportListenEnd(requestId.String(), alive); err != nil {
 		log.Println(fmt.Errorf("[%s] couldn't report listen end to reporter %T: %w", requestId, h.reporter, err))
 	}
