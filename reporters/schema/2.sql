@@ -1,0 +1,6 @@
+BEGIN;
+
+ALTER TABLE listen
+    ADD COLUMN referrer TEXT DEFAULT '';
+
+COMMIT;
