@@ -31,5 +31,6 @@ func MakeListenerInfoFromRequest(cfg *config.Config, proxyUrl *url.URL, r *http.
 
 type ListenReporter interface {
 	ReportListenStart(clientId string, info *ListenerInfo) error
+	ReportGeoIP(clientId string, info *ListenerInfo)
 	ReportListenEnd(clientId string, time time.Duration) error
 }

@@ -22,6 +22,7 @@ type Config struct {
 	Reporter       string
 	Logfile        string
 	Verbosity      int
+	GeoIPPath      string
 	Postgres       PostgresReporter
 
 	TrustedProxies []string
@@ -61,6 +62,7 @@ type HttpServer struct {
 	BaseUrl      string
 	AllowedPaths []string
 	Default      bool
+	EnableGeoIP  bool
 }
 
 type PostgresReporter struct {

@@ -2,6 +2,8 @@
 HttpListenAddr = "localhost:3000"
 # The listener reporter to use. Possible values: "log", "postgres"
 Reporter = "log"
+# How much to log
+Verbosity = 0
 # Reverse proxies to trust with X-Forwarded-For values.
 TrustedProxies = []
 # If using a supported CDN, their IP ranges can be automatically added to TrustedProxies.
@@ -9,6 +11,8 @@ TrustedProxies = []
 TrustedCDNs = ["cloudflare"]
 # If using a http reverse proxy with Default, set this to this server's IP. It will be added to the X-Forwarded-For header.
 HttpLocalIp = "192.168.0.1"
+# If using GeoIP, path to a Maxmind GeoLite2/GeoIP2 City DB. If not, leave empty.
+GeoIpPath = ""
 
 [Postgres]
 Host = "localhost"
@@ -31,3 +35,5 @@ AllowedPaths = ["/live-high", "/live-high-ogg", "/live-mobile"]
 # If set, and no server-path combination matches, requests will be forwarded to this server
 # (and not counted as listens)
 Default = true
+# Calculate GeoIPs for this HTTPServer. Requires GeoIPPath to be set.
+EnableGeoIP = true

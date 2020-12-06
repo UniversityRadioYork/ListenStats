@@ -13,6 +13,10 @@ func (l *LogReporter) ReportListenStart(clientId string, info *ListenerInfo) err
 	return nil
 }
 
+func (l *LogReporter) ReportGeoIP(_ string, _ *ListenerInfo) {
+	log.Printf("Got GeoIp request but not doing anything")
+}
+
 func (l *LogReporter) ReportListenEnd(clientId string, time time.Duration) error {
 	log.Printf("LISTENER [%s] over, took %v", clientId, time)
 	return nil

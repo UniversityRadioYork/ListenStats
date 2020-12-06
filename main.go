@@ -51,7 +51,7 @@ func main() {
 	case "log":
 		reporter = &reporters.LogReporter{}
 	case "postgres":
-		reporter, err = reporters.NewPostgresReporter(&config.Postgres)
+		reporter, err = reporters.NewPostgresReporter(&config)
 		if err != nil {
 			log.Fatal(fmt.Errorf("couldn't create postgres reporter: %w", err))
 		}

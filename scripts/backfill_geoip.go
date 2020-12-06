@@ -5,11 +5,16 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"github.com/oschwald/geoip2-golang"
+	lsgeoip "listenstats/utils/geoip"
 	"log"
-	"net"
 	"runtime"
 )
+
+type Result struct {
+	ListenID      uint64 `sql:"listen_id"`
+	GeoIPCountry  string `sql:"geoip_country"`
+	GeoIPLocation string `sql:"geoip_location"`
+}
 
 type Row struct {
 	ListenID  uint64 `sql:"listen_id"`
@@ -19,13 +24,7 @@ type Row struct {
 	UserAgent string `sql:"user_agent"`
 }
 
-type Result struct {
-	ListenID      uint64 `sql:"listen_id"`
-	GeoIPCountry  string `sql:"geoip_country"`
-	GeoIPLocation string `sql:"geoip_location"`
-}
-
-var geoipDb *geoip2.Reader
+var geoip *lsgeoip.GeoIP
 var tasks chan Row
 var results = make(chan Result)
 var done = make(chan struct{})
@@ -34,19 +33,14 @@ func work() {
 	//fmt.Println("worker ready")
 	for task := range tasks {
 		//fmt.Printf("task %v\n", task)
-		ip := net.ParseIP(task.IPAddr)
-		country, err := geoipDb.Country(ip)
-		if err != nil {
-			panic(err)
-		}
-		loc, err := geoipDb.City(ip)
+		rez, err := geoip.Process(task.IPAddr)
 		if err != nil {
 			panic(err)
 		}
 		result := Result{
 			ListenID:      task.ListenID,
-			GeoIPCountry:  country.Country.IsoCode,
-			GeoIPLocation: loc.City.Names["en"],
+			GeoIPCountry:  rez.GeoIPCountry,
+			GeoIPLocation: rez.GeoIPLocation,
 		}
 		//fmt.Printf("pushing %+v\n", result)
 		results <- result
@@ -75,11 +69,11 @@ func main() {
 	}
 
 	var err error
-	geoipDb, err = geoip2.Open(*geoipPath)
+	geoip, err = lsgeoip.NewGeoIP(*geoipPath)
 	if err != nil {
 		panic(err)
 	}
-	defer geoipDb.Close()
+	defer geoip.Close()
 
 	pg, err := sqlx.Open("postgres", *dbUrl)
 	if err != nil {

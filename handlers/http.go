@@ -100,6 +100,10 @@ func (h *HttpHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("X-URY-RequestID", requestId.String())
 	vars := mux.Vars(r)
 
+	if h.cfg.Verbosity >= 2 {
+		log.Printf("[%s] hello\n", requestId)
+	}
+
 	var server *config.HttpServer
 	for _, srv := range h.cfg.HttpServers {
 		for _, path := range srv.AllowedPaths {
@@ -158,6 +162,10 @@ func (h *HttpHandler) Handle(w http.ResponseWriter, r *http.Request) {
 	reportEnd := time.Now()
 	if h.cfg.Verbosity >= 2 {
 		log.Printf("[%s] reporting to %T took %v\n", requestId, h.reporter, reportEnd.Sub(reportStart))
+	}
+
+	if server.EnableGeoIP {
+		h.reporter.ReportGeoIP(requestId.String(), listenerInfo)
 	}
 
 	reverseRes, err := http.Get(reverseUrl.String())

@@ -4,17 +4,21 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"listenstats/config"
+	cfg "listenstats/config"
+	"listenstats/utils/geoip"
+	"log"
 	"strings"
 	"time"
 )
 
 type PostgresReporter struct {
 	db            *sqlx.DB
+	queuedGeoip   *geoip.QueuedGeoIP
 	minListenTime time.Duration
 }
 
-func NewPostgresReporter(config *config.PostgresReporter) (*PostgresReporter, error) {
+func NewPostgresReporter(globalConfig *cfg.Config) (*PostgresReporter, error) {
+	config := globalConfig.Postgres
 	var pwd string
 	if strings.ContainsAny(config.Password, " ") || len(config.Password) == 0 {
 		pwd = "'" + config.Password + "'"
@@ -46,10 +50,50 @@ func NewPostgresReporter(config *config.PostgresReporter) (*PostgresReporter, er
 			return nil, err
 		}
 	}
-	return &PostgresReporter{db: db, minListenTime: config.MinListenTime.Duration}, nil
+	result := &PostgresReporter{db: db, minListenTime: config.MinListenTime.Duration}
+	if globalConfig.GeoIPPath != "" {
+		result.queuedGeoip, err = geoip.NewQueuedGeoIP(globalConfig.GeoIPPath)
+		if err != nil {
+			return nil, err
+		}
+		go result.queuedGeoip.Work()
+		go result.handleGeoIpResults()
+	}
+	return result, nil
+}
+
+func (r *PostgresReporter) handleGeoIpResults() {
+	for {
+		select {
+		// We can do the "ok; return" trick on both, because we know they'll get closed simultaneously
+		case result, ok := <-r.queuedGeoip.Results:
+			if !ok {
+				return
+			}
+			_, err := r.db.Exec(
+				`UPDATE listen
+			SET geoip_country = $2, geoip_location = $3
+			WHERE client_id = $1`,
+				result.ClientID,
+				result.GeoIPCountry,
+				result.GeoIPLocation,
+			)
+			if err != nil {
+				panic(err)
+			}
+		case err, ok := <-r.queuedGeoip.Errors:
+			if !ok {
+				return
+			}
+			log.Printf("WARN: geoIP error %v", err)
+		}
+	}
 }
 
 func (r *PostgresReporter) Close() error {
+	if r.queuedGeoip != nil {
+		r.queuedGeoip.Close()
+	}
 	return r.db.Close()
 }
 
@@ -67,6 +111,10 @@ func (r *PostgresReporter) ReportListenStart(clientId string, info *ListenerInfo
 		referrer,
 	)
 	return err
+}
+
+func (r *PostgresReporter) ReportGeoIP(clientId string, info *ListenerInfo) {
+	r.queuedGeoip.Request(clientId, info.IP)
 }
 
 func (r *PostgresReporter) ReportListenEnd(clientId string, time time.Duration) error {
