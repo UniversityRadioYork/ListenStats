@@ -56,13 +56,15 @@ func (r *PostgresReporter) Close() error {
 func (r *PostgresReporter) ReportListenStart(clientId string, info *ListenerInfo) error {
 	mount := info.ServerURL.Path
 	ua := info.Headers.Get("User-Agent")
+	referrer := info.Headers.Get("Referer")
 	_, err := r.db.Exec(
-		`INSERT INTO listens.listen (mount, client_id, ip_address, user_agent, time_start, time_end)
-        VALUES ($1, $2, $3, $4, NOW(), NULL)`,
+		`INSERT INTO listens.listen (mount, client_id, ip_address, user_agent, referrer, time_start, time_end)
+        VALUES ($1, $2, $3, $4, $5, NOW(), NULL)`,
 		mount,
 		clientId,
 		info.IP,
 		ua,
+		referrer,
 	)
 	return err
 }
