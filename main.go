@@ -1,9 +1,8 @@
 package main
 
 import (
+	"flag"
 	"fmt"
-	"github.com/burntsushi/toml"
-	"github.com/gorilla/mux"
 	"io"
 	cfg "listenstats/config"
 	"listenstats/handlers"
@@ -11,6 +10,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/burntsushi/toml"
+	"github.com/gorilla/mux"
 )
 
 func main() {
@@ -26,6 +28,11 @@ func main() {
 	if err != nil {
 		log.Fatal(fmt.Errorf("couldn't parse config: %w", err))
 	}
+
+	// Override certain variables by flags
+	flag.IntVar(&config.Verbosity, "v", 0, "verbosity")
+
+	flag.Parse()
 
 	if err := config.Init(); err != nil {
 		log.Fatal(fmt.Errorf("failed to initalise CDN: %w", err))

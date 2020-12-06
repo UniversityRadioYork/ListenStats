@@ -21,7 +21,7 @@ type Config struct {
 	HttpLocalIp    string
 	Reporter       string
 	Logfile        string
-	Verbosity      uint8
+	Verbosity      int
 	Postgres       PostgresReporter
 
 	TrustedProxies []string
